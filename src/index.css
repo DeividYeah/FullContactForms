@@ -1,6 +1,190 @@
+:root {
+  --rojo: #c62828;
+  --verde: #2e7d32;
+  --ambar: #b26a00;
+  --borde: #ccc;
+  --suave: #666;
+}
+
 body {
   font-family: system-ui, sans-serif;
   margin: 0 auto;
-  max-width: 1000px;
+  max-width: 1100px;
   padding: 16px;
+  color: #222;
+}
+
+header h1 {
+  margin-bottom: 4px;
+}
+
+.columnas {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 32px;
+  align-items: start;
+}
+
+@media (max-width: 800px) {
+  .columnas {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Formulario */
+.formulario {
+  border: 1px solid var(--borde);
+  border-radius: 8px;
+  padding: 16px;
+}
+
+.campo {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 12px;
+  flex: 1;
+}
+
+.fila {
+  display: flex;
+  gap: 12px;
+}
+
+label {
+  font-weight: 600;
+}
+
+input,
+select,
+textarea {
+  font: inherit;
+  padding: 6px 8px;
+  border: 1px solid var(--borde);
+  border-radius: 4px;
+}
+
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+button:focus-visible {
+  outline: 3px solid #1565c0;
+  outline-offset: 1px;
+}
+
+[aria-invalid='true'] {
+  border-color: var(--rojo);
+  background: #fff5f5;
+}
+
+.check {
+  font-weight: normal;
+}
+
+.ayuda {
+  color: var(--suave);
+}
+
+.error {
+  color: var(--rojo);
+  margin: 0;
+  font-size: 0.9em;
+}
+
+.sugerencia {
+  margin-top: -4px;
+  color: var(--suave);
+}
+
+button {
+  font: inherit;
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: progress;
+  opacity: 0.6;
+}
+
+.principal {
+  width: 100%;
+  padding: 10px;
+  background: #222;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-weight: 700;
+}
+
+.enlace {
+  background: none;
+  border: none;
+  color: #1565c0;
+  text-decoration: underline;
+  padding: 0;
+}
+
+/* Avisos de estado */
+.aviso {
+  border-radius: 4px;
+  padding: 8px 12px;
+  margin: 12px 0;
+}
+
+.exito {
+  background: #e8f5e9;
+  color: var(--verde);
+}
+
+.fallo {
+  background: #ffebee;
+  color: var(--rojo);
+}
+
+.corrupto {
+  background: #fff8e1;
+  color: var(--ambar);
+}
+
+.cargando,
+.actualizando {
+  color: var(--suave);
+  font-style: italic;
+}
+
+/* Listado */
+.cabecera-lista {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+}
+
+.lista {
+  list-style: none;
+  padding: 0;
+  display: grid;
+  gap: 12px;
+}
+
+.tarjeta {
+  border: 1px solid var(--borde);
+  border-radius: 6px;
+  padding: 12px;
+}
+
+.tarjeta h3 {
+  margin: 0 0 4px;
+}
+
+.tarjeta p {
+  margin: 4px 0;
+}
+
+.apodo {
+  color: var(--suave);
+  font-weight: normal;
+}
+
+.grito {
+  font-style: italic;
 }
