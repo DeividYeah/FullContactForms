@@ -4,7 +4,11 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "concurrently -k -n api,web -c yellow,cyan \"npm:api\" \"npm:web\"",
+    "web": "vite",
+    "preapi": "node -e \"const fs=require('fs');if(!fs.existsSync('db.json'))fs.copyFileSync('db.seed.json','db.json')\"",
+    "api": "json-server --watch db.json --port 3001 --delay 600",
+    "reset-db": "node -e \"require('fs').copyFileSync('db.seed.json','db.json')\"",
     "build": "vite build",
     "preview": "vite preview"
   },
@@ -14,6 +18,8 @@
   },
   "devDependencies": {
     "@vitejs/plugin-react": "^6.3.0",
+    "concurrently": "^10.0.7",
+    "json-server": "^0.17.4",
     "vite": "^8.3.8"
   }
 }
