@@ -1,4 +1,5 @@
 import FormularioInscripcion from './components/FormularioInscripcion.jsx'
+import ListaLuchadores from './components/ListaLuchadores.jsx'
 
 export default function App() {
   return (
@@ -7,7 +8,10 @@ export default function App() {
         <h1>Full Contact · Torneo U-tad</h1>
         <p>Inscripción de luchadores para el torneo de deportes de contacto.</p>
       </header>
-      <FormularioInscripcion />
+      <div className="columnas">
+        <FormularioInscripcion />
+        <ListaLuchadores />
+      </div>
     </main>
   )
 }
