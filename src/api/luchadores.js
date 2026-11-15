@@ -1,3 +1,6 @@
+import { z } from 'zod'
+import { luchadorSchema } from '../schemas/luchador.js'
+
 // Todas las peticiones HTTP de la app viven aquí.
 // La API es json-server (npm run api) en el puerto 3001.
 const API_URL = 'http://localhost:3001/luchadores'
@@ -23,10 +26,34 @@ async function pedir(url, opciones) {
   return respuesta.json()
 }
 
-export function obtenerLuchadores(categoria) {
+// Reto bonus: no nos fiamos del servidor. Cada luchador que llega se valida
+// con el mismo esquema Zod que el formulario. Los que no cumplen se apartan
+// en "descartados" en vez de romper toda la lista.
+export async function obtenerLuchadores(categoria) {
   const params = new URLSearchParams({ _sort: 'creadoEn', _order: 'desc' })
   if (categoria) params.set('categoria', categoria)
-  return pedir(`${API_URL}?${params}`)
+  const json = await pedir(`${API_URL}?${params}`)
+
+  const lista = z.array(z.unknown()).safeParse(json)
+  if (!lista.success) {
+    throw new ErrorApi('El servidor ha devuelto algo que no es una lista de luchadores')
+  }
+
+  const luchadores = []
+  const descartados = []
+  for (const item of lista.data) {
+    const resultado = luchadorSchema.safeParse(item)
+    if (resultado.success) {
+      luchadores.push(resultado.data)
+    } else {
+      descartados.push({
+        id: item?.id ?? '¿sin id?',
+        apodo: item?.apodo ?? '¿sin apodo?',
+        problemas: resultado.error.issues.map((issue) => `${issue.path.join('.')}: ${issue.message}`),
+      })
+    }
+  }
+  return { luchadores, descartados }
 }
 
 export async function crearLuchador(datos) {
@@ -36,11 +63,17 @@ export async function crearLuchador(datos) {
     throw new ErrorApi(`El apodo "${datos.apodo}" ya está cogido`, 'apodo')
   }
 
-  return pedir(API_URL, {
+  const creado = await pedir(API_URL, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ ...datos, creadoEn: new Date().toISOString() }),
   })
+
+  const resultado = luchadorSchema.safeParse(creado)
+  if (!resultado.success) {
+    throw new ErrorApi('El servidor ha guardado la inscripción con datos que no cuadran')
+  }
+  return resultado.data
 }
 
 export function borrarLuchador(id) {
