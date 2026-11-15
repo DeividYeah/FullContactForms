@@ -10,7 +10,7 @@ export default function TarjetaLuchador({ luchador, onBorrar, borrando }) {
         {luchador.disciplina} · {CATEGORIAS[luchador.categoria].nombre} · {luchador.peso} kg
       </p>
       <p>
-        {calcularEdad(luchador.fechaNacimiento)} años · {luchador.experiencia} de experiencia
+        {calcularEdad(luchador.fechaNacimiento)} años · {luchador.experiencia} años entrenando
       </p>
       {luchador.grito && <p className="grito">“{luchador.grito}”</p>}
       <button type="button" onClick={() => onBorrar(luchador)} disabled={borrando}>
