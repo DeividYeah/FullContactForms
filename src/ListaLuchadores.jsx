@@ -1,5 +1,22 @@
-import { useBorrarLuchador, useLuchadores } from '../hooks/useLuchadores.js'
-import TarjetaLuchador from './TarjetaLuchador.jsx'
+import { CATEGORIAS, calcularEdad } from './luchador.js'
+import { useBorrarLuchador, useLuchadores } from './api.js'
+
+function TarjetaLuchador({ luchador, onBorrar, borrando }) {
+  return (
+    <li className="tarjeta">
+      <h3>
+        {luchador.nombre} <span className="apodo">«{luchador.apodo}»</span>
+      </h3>
+      <p>
+        {luchador.disciplina} · {CATEGORIAS[luchador.categoria].nombre} · {luchador.peso} kg
+      </p>
+      <p>{calcularEdad(luchador.fechaNacimiento)} años</p>
+      <button type="button" onClick={() => onBorrar(luchador)} disabled={borrando}>
+        {borrando ? 'Retirando…' : 'Retirar inscripción'}
+      </button>
+    </li>
+  )
+}
 
 export default function ListaLuchadores() {
   const { data, isPending, isError, error, refetch } = useLuchadores()

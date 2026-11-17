@@ -1,7 +1,8 @@
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { z } from 'zod'
-import { luchadorSchema } from '../schemas/luchador.js'
+import { luchadorSchema } from './luchador.js'
 
-// Todas las peticiones HTTP de la app viven aquí.
+// Peticiones HTTP al API y hooks de TanStack Query que las usan.
 // La API es json-server (npm run api) en el puerto 3001.
 const API_URL = 'http://localhost:3001/luchadores'
 
@@ -76,4 +77,31 @@ export async function crearLuchador(datos) {
 
 export function borrarLuchador(id) {
   return pedir(`${API_URL}/${id}`, { method: 'DELETE' })
+}
+
+// ---------- Hooks de TanStack Query ----------
+// Clave de la lista. Crear y borrar la invalidan para que se vuelva a pedir.
+export const CLAVE_LUCHADORES = ['luchadores']
+
+export function useLuchadores() {
+  return useQuery({
+    queryKey: CLAVE_LUCHADORES,
+    queryFn: obtenerLuchadores,
+  })
+}
+
+export function useCrearLuchador() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: crearLuchador,
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: CLAVE_LUCHADORES }),
+  })
+}
+
+export function useBorrarLuchador() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: borrarLuchador,
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: CLAVE_LUCHADORES }),
+  })
 }

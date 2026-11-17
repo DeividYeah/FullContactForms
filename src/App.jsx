@@ -1,5 +1,5 @@
-import FormularioInscripcion from './components/FormularioInscripcion.jsx'
-import ListaLuchadores from './components/ListaLuchadores.jsx'
+import FormularioInscripcion from './FormularioInscripcion.jsx'
+import ListaLuchadores from './ListaLuchadores.jsx'
 
 export default function App() {
   return (

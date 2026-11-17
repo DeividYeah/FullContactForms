@@ -29,18 +29,14 @@ error y un botón **Reintentar**, y el formulario avisa de que no hay conexión.
 ## Estructura
 
 ```
-db.seed.json                     datos iniciales (incluye un registro corrupto)
+db.seed.json                 datos iniciales (incluye un registro corrupto)
 src/
-  main.jsx                       QueryClientProvider y opciones por defecto
-  App.jsx                        layout: formulario + listado
-  schemas/luchador.js            esquemas Zod (única fuente de verdad)
-  api/luchadores.js              fetch al API + validación de respuestas
-  hooks/useLuchadores.js         useQuery / useMutation y claves de query
-  components/
-    Campo.jsx                    label + ayuda + error accesibles
-    FormularioInscripcion.jsx    formulario con RHF + zodResolver
-    ListaLuchadores.jsx          listado, borrado y estados de carga/error
-    TarjetaLuchador.jsx          tarjeta de un luchador
+  main.jsx                   QueryClientProvider y opciones por defecto
+  App.jsx                    layout: formulario + listado
+  luchador.js                esquemas Zod (única fuente de verdad)
+  api.js                     fetch al API, validación de respuestas y hooks de TanStack Query
+  FormularioInscripcion.jsx  formulario con RHF + zodResolver (y el componente Campo)
+  ListaLuchadores.jsx        listado, borrado y estados de carga/error (y la tarjeta)
 ```
 
 ## Decisiones
@@ -77,7 +73,8 @@ src/
   También comprobé que el registro `glitch` sale en el aviso de descartados.
 - **Qué hice yo:** elegir el dominio, probar los casos de arriba, revisar el código para
   poder explicarlo y pedir que se simplificara (quité teléfono, grito de guerra, años de
-  experiencia, la sugerencia de categoría y el filtro por categoría).
+  experiencia, la sugerencia de categoría y el filtro por categoría, y junté el código en
+  menos ficheros).
 
 ## Autopsia
 
