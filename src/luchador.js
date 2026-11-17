@@ -1,11 +1,11 @@
 import { z } from 'zod'
 
-// Única fuente de verdad de la validación: el formulario (zodResolver)
-// y las respuestas del API (safeParse) usan estos mismos esquemas.
+// Esquemas Zod: son la única fuente de verdad de la validación.
+// El formulario usa inscripcionSchema y la lista usa luchadorSchema.
 
 export const DISCIPLINAS = ['Boxeo', 'Kickboxing', 'Muay Thai', 'MMA', 'Judo']
 
-// Peso máximo (kg) de cada categoría. "pesado" no tiene límite superior.
+// Peso mínimo y máximo (kg) de cada categoría.
 export const CATEGORIAS = {
   mosca: { nombre: 'Mosca', min: 45, max: 57 },
   ligero: { nombre: 'Ligero', min: 57, max: 70 },
@@ -13,66 +13,44 @@ export const CATEGORIAS = {
   pesado: { nombre: 'Pesado', min: 84, max: 150 },
 }
 
-export function calcularEdad(fechaISO, hoy = new Date()) {
-  const nacimiento = new Date(fechaISO)
-  let edad = hoy.getFullYear() - nacimiento.getFullYear()
-  const mes = hoy.getMonth() - nacimiento.getMonth()
-  if (mes < 0 || (mes === 0 && hoy.getDate() < nacimiento.getDate())) edad--
-  return edad
+// Años cumplidos a partir de una fecha "AAAA-MM-DD".
+export function calcularEdad(fecha) {
+  const milisegundosPorAnio = 365.25 * 24 * 60 * 60 * 1000
+  return Math.floor((Date.now() - new Date(fecha)) / milisegundosPorAnio)
 }
 
-// Campos comunes a lo que se envía y a lo que devuelve el API.
-const camposLuchador = z.object({
-  nombre: z
-    .string()
-    .trim()
-    .min(3, 'El nombre debe tener al menos 3 letras')
-    .max(40, 'Máximo 40 caracteres'),
+// Campos que tiene cualquier luchador.
+const luchadorBase = z.object({
+  nombre: z.string().trim().min(3, 'El nombre debe tener al menos 3 letras'),
   apodo: z
     .string()
-    .trim()
-    .toLowerCase()
-    .regex(/^[a-z0-9-]{3,20}$/, 'Entre 3 y 20 caracteres: letras, números o guiones, sin espacios'),
-  email: z.email('Escribe un email válido, por ejemplo nombre@dominio.com'),
+    .regex(/^[a-z0-9-]{3,20}$/, 'Entre 3 y 20 caracteres: minúsculas, números o guiones'),
+  email: z.email('Escribe un email válido'),
   fechaNacimiento: z.iso.date('Indica tu fecha de nacimiento'),
   disciplina: z.enum(DISCIPLINAS, 'Elige una disciplina'),
-  peso: z
-    .number('Indica tu peso en kg')
-    .min(45, 'El peso mínimo del torneo es 45 kg')
-    .max(150, 'El peso máximo del torneo es 150 kg'),
-  categoria: z.enum(Object.keys(CATEGORIAS), 'Elige una categoría de peso'),
+  peso: z.number('Indica tu peso en kg').min(45, 'Mínimo 45 kg').max(150, 'Máximo 150 kg'),
+  categoria: z.enum(Object.keys(CATEGORIAS), 'Elige una categoría'),
 })
 
-// Reglas que relacionan varios campos entre sí.
-function reglasCruzadas(datos, ctx) {
-  const edad = calcularEdad(datos.fechaNacimiento)
-  if (Number.isNaN(edad) || edad < 16) {
-    ctx.addIssue({ code: 'custom', path: ['fechaNacimiento'], message: 'Hay que tener al menos 16 años para competir' })
-  } else if (edad > 60) {
-    ctx.addIssue({ code: 'custom', path: ['fechaNacimiento'], message: 'El torneo es hasta los 60 años' })
-  }
-
-  const { min, max, nombre } = CATEGORIAS[datos.categoria]
-  if (datos.peso < min || datos.peso > max) {
-    ctx.addIssue({
-      code: 'custom',
-      path: ['categoria'],
-      message: `Con ${datos.peso} kg no entras en ${nombre} (${min}–${max} kg)`,
-    })
-  }
-}
-
-// Esquema del formulario: campos + checkbox del reglamento + reglas cruzadas.
-export const inscripcionSchema = camposLuchador
+// Formulario: los campos + el reglamento + dos reglas que mezclan campos.
+export const inscripcionSchema = luchadorBase
   .extend({
-    aceptaReglamento: z.literal(true, 'Tienes que aceptar el reglamento del torneo'),
+    aceptaReglamento: z.literal(true, 'Tienes que aceptar el reglamento'),
   })
-  .superRefine(reglasCruzadas)
+  .refine((datos) => calcularEdad(datos.fechaNacimiento) >= 16, {
+    message: 'Hay que tener al menos 16 años',
+    path: ['fechaNacimiento'],
+  })
+  .refine(
+    (datos) => {
+      const { min, max } = CATEGORIAS[datos.categoria]
+      return datos.peso >= min && datos.peso <= max
+    },
+    { message: 'Tu peso no entra en esa categoría', path: ['categoria'] }
+  )
 
-// Esquema de un luchador tal y como lo devuelve el API.
-export const luchadorSchema = camposLuchador
-  .extend({
-    id: z.union([z.number(), z.string()]),
-    creadoEn: z.iso.datetime(),
-  })
-  .superRefine(reglasCruzadas)
+// Lo que devuelve el API: los campos + id y fecha de alta.
+export const luchadorSchema = luchadorBase.extend({
+  id: z.number(),
+  creadoEn: z.string(),
+})

@@ -1,26 +1,15 @@
-:root {
-  --rojo: #c62828;
-  --verde: #2e7d32;
-  --ambar: #b26a00;
-  --borde: #ccc;
-  --suave: #666;
-}
-
 body {
   font-family: system-ui, sans-serif;
+  max-width: 1000px;
   margin: 0 auto;
-  max-width: 1100px;
   padding: 16px;
   color: #222;
 }
 
-header h1 {
-  margin-bottom: 4px;
-}
-
+/* Formulario a la izquierda y lista a la derecha (una columna en móvil) */
 .columnas {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  grid-template-columns: 1fr 1fr;
   gap: 32px;
   align-items: start;
 }
@@ -31,9 +20,8 @@ header h1 {
   }
 }
 
-/* Formulario */
 .formulario {
-  border: 1px solid var(--borde);
+  border: 1px solid #ccc;
   border-radius: 8px;
   padding: 16px;
 }
@@ -43,126 +31,81 @@ header h1 {
   flex-direction: column;
   gap: 4px;
   margin-bottom: 12px;
-  flex: 1;
-  min-width: 0;
-}
-
-.fila {
-  display: flex;
-  gap: 12px;
-}
-
-label {
-  font-weight: 600;
 }
 
 input,
 select,
-textarea {
+button {
   font: inherit;
   padding: 6px 8px;
-  border: 1px solid var(--borde);
-  border-radius: 4px;
 }
 
-input:focus-visible,
-select:focus-visible,
-textarea:focus-visible,
-button:focus-visible {
-  outline: 3px solid #1565c0;
-  outline-offset: 1px;
-}
-
+/* Campo con error (aria-invalid lo pone React Hook Form + Zod) */
 [aria-invalid='true'] {
-  border-color: var(--rojo);
+  border: 1px solid #c62828;
   background: #fff5f5;
 }
 
-.check {
-  font-weight: normal;
-}
-
-.ayuda {
-  color: var(--suave);
-}
-
 .error {
-  color: var(--rojo);
+  color: #c62828;
   margin: 0;
-  font-size: 0.9em;
-}
-
-button {
-  font: inherit;
-  cursor: pointer;
-}
-
-button:disabled {
-  cursor: progress;
-  opacity: 0.6;
 }
 
 .principal {
   width: 100%;
-  padding: 10px;
   background: #222;
   color: white;
   border: none;
   border-radius: 4px;
-  font-weight: 700;
+  font-weight: bold;
 }
 
-/* Avisos de estado */
+button:disabled {
+  opacity: 0.6;
+}
+
 .aviso {
-  border-radius: 4px;
   padding: 8px 12px;
-  margin: 12px 0;
+  border-radius: 4px;
 }
 
 .exito {
   background: #e8f5e9;
-  color: var(--verde);
+  color: #2e7d32;
 }
 
 .fallo {
   background: #ffebee;
-  color: var(--rojo);
+  color: #c62828;
 }
 
 .corrupto {
   background: #fff8e1;
-  color: var(--ambar);
+  color: #b26a00;
 }
 
 .cargando {
-  color: var(--suave);
   font-style: italic;
 }
-
-/* Listado */
 
 .lista {
   list-style: none;
   padding: 0;
-  display: grid;
-  gap: 12px;
 }
 
 .tarjeta {
-  border: 1px solid var(--borde);
+  border: 1px solid #ccc;
   border-radius: 6px;
   padding: 12px;
+  margin-bottom: 12px;
 }
 
-.tarjeta h3 {
-  margin: 0 0 4px;
-}
-
+.tarjeta h3,
 .tarjeta p {
-  margin: 4px 0;
+  margin: 0 0 6px;
 }
 
 .apodo {
-  color: var(--suave);
+  color: #666;
   font-weight: normal;
 }

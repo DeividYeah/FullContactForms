@@ -1,86 +1,46 @@
-import { CATEGORIAS, calcularEdad } from './luchador.js'
+import { CATEGORIAS } from './luchador.js'
 import { useBorrarLuchador, useLuchadores } from './api.js'
 
-function TarjetaLuchador({ luchador, onBorrar, borrando }) {
-  return (
-    <li className="tarjeta">
-      <h3>
-        {luchador.nombre} <span className="apodo">«{luchador.apodo}»</span>
-      </h3>
-      <p>
-        {luchador.disciplina} · {CATEGORIAS[luchador.categoria].nombre} · {luchador.peso} kg
-      </p>
-      <p>{calcularEdad(luchador.fechaNacimiento)} años</p>
-      <button type="button" onClick={() => onBorrar(luchador)} disabled={borrando}>
-        {borrando ? 'Retirando…' : 'Retirar inscripción'}
-      </button>
-    </li>
-  )
-}
-
 export default function ListaLuchadores() {
-  const { data, isPending, isError, error, refetch } = useLuchadores()
+  const { data, isPending, isError } = useLuchadores()
   const borrar = useBorrarLuchador()
 
   function handleBorrar(luchador) {
-    if (window.confirm(`¿Retirar a «${luchador.apodo}» del torneo?`)) {
+    if (window.confirm(`¿Retirar a ${luchador.apodo} del torneo?`)) {
       borrar.mutate(luchador.id)
     }
   }
 
+  // Estados de la petición: cargando, error y datos.
+  if (isPending) return <p className="cargando">Cargando luchadores…</p>
+  if (isError) return <p className="aviso fallo">No se pudo conectar con el servidor. ¿Está arrancado con npm run dev?</p>
+
   return (
-    <section className="listado" aria-labelledby="titulo-lista">
-      <h2 id="titulo-lista">Luchadores inscritos</h2>
+    <section>
+      <h2>Luchadores inscritos ({data.luchadores.length})</h2>
 
-      {borrar.isError && <p className="aviso fallo">❌ No se pudo retirar: {borrar.error.message}</p>}
-
-      {isPending && <p className="cargando">Cargando luchadores…</p>}
-
-      {isError && (
-        <div className="aviso fallo" role="alert">
-          <p>❌ {error.message}</p>
-          <button type="button" onClick={() => refetch()}>
-            Reintentar
-          </button>
-        </div>
+      {/* Reto bonus: aviso de los datos que Zod ha rechazado */}
+      {data.descartados > 0 && (
+        <p className="aviso corrupto">⚠️ {data.descartados} registro(s) descartados por datos incorrectos</p>
       )}
 
-      {data && data.descartados.length > 0 && (
-        <details className="aviso corrupto">
-          <summary>
-            ⚠️ {data.descartados.length} registro(s) del servidor descartados por no cumplir el esquema
-          </summary>
-          <ul>
-            {data.descartados.map((d) => (
-              <li key={d.id}>
-                <strong>
-                  #{d.id} «{d.apodo}»
-                </strong>
-                <ul>
-                  {d.problemas.map((problema) => (
-                    <li key={problema}>{problema}</li>
-                  ))}
-                </ul>
-              </li>
-            ))}
-          </ul>
-        </details>
-      )}
+      {borrar.isError && <p className="aviso fallo">No se pudo retirar la inscripción.</p>}
 
-      {data && data.luchadores.length === 0 && <p>Todavía no hay nadie inscrito. ¡Sé el primero!</p>}
-
-      {data && data.luchadores.length > 0 && (
-        <ul className="lista">
-          {data.luchadores.map((luchador) => (
-            <TarjetaLuchador
-              key={luchador.id}
-              luchador={luchador}
-              onBorrar={handleBorrar}
-              borrando={borrar.isPending && borrar.variables === luchador.id}
-            />
-          ))}
-        </ul>
-      )}
+      <ul className="lista">
+        {data.luchadores.map((luchador) => (
+          <li key={luchador.id} className="tarjeta">
+            <h3>
+              {luchador.nombre} <span className="apodo">({luchador.apodo})</span>
+            </h3>
+            <p>
+              {luchador.disciplina} · {CATEGORIAS[luchador.categoria].nombre} · {luchador.peso} kg
+            </p>
+            <button type="button" onClick={() => handleBorrar(luchador)} disabled={borrar.isPending}>
+              Retirar inscripción
+            </button>
+          </li>
+        ))}
+      </ul>
     </section>
   )
 }
