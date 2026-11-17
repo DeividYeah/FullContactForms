@@ -12,22 +12,13 @@ const VALORES_INICIALES = {
   disciplina: '',
   peso: '',
   categoria: '',
-  experiencia: '',
-  telefono: '',
-  grito: '',
   aceptaReglamento: false,
-}
-
-function categoriaParaPeso(peso) {
-  return Object.keys(CATEGORIAS).find((clave) => peso >= CATEGORIAS[clave].min && peso <= CATEGORIAS[clave].max)
 }
 
 export default function FormularioInscripcion() {
   const {
     register,
     handleSubmit,
-    watch,
-    setValue,
     setError,
     reset,
     formState: { errors },
@@ -37,11 +28,6 @@ export default function FormularioInscripcion() {
     mode: 'onTouched',
   })
   const crear = useCrearLuchador()
-
-  const peso = watch('peso')
-  const categoria = watch('categoria')
-  const grito = watch('grito') ?? ''
-  const sugerida = Number.isFinite(peso) ? categoriaParaPeso(peso) : undefined
 
   function onSubmit(datos) {
     // El checkbox solo sirve para validar: no se guarda en el servidor.
@@ -107,33 +93,6 @@ export default function FormularioInscripcion() {
           )}
         </Campo>
       </div>
-
-      {sugerida && sugerida !== categoria && (
-        <p className="sugerencia" aria-live="polite">
-          Con {peso} kg te corresponde <strong>{CATEGORIAS[sugerida].nombre}</strong>.{' '}
-          <button
-            type="button"
-            className="enlace"
-            onClick={() => setValue('categoria', sugerida, { shouldValidate: true })}
-          >
-            Usar esa categoría
-          </button>
-        </p>
-      )}
-
-      <div className="fila">
-        <Campo id="experiencia" etiqueta="Años de experiencia *" error={errors.experiencia}>
-          {(props) => <input {...props} type="number" min="0" {...register('experiencia', { valueAsNumber: true })} />}
-        </Campo>
-
-        <Campo id="telefono" etiqueta="Teléfono (opcional)" error={errors.telefono}>
-          {(props) => <input {...props} type="tel" autoComplete="tel" {...register('telefono')} />}
-        </Campo>
-      </div>
-
-      <Campo id="grito" etiqueta="Grito de guerra (opcional)" error={errors.grito} ayuda={`${grito.length}/80 caracteres`}>
-        {(props) => <textarea {...props} rows={2} {...register('grito')} />}
-      </Campo>
 
       <div className={errors.aceptaReglamento ? 'campo campo-con-error' : 'campo'}>
         <label className="check">
