@@ -39,7 +39,7 @@ src/
   components/
     Campo.jsx                    label + ayuda + error accesibles
     FormularioInscripcion.jsx    formulario con RHF + zodResolver
-    ListaLuchadores.jsx          listado, filtro y estados de carga/error
+    ListaLuchadores.jsx          listado, borrado y estados de carga/error
     TarjetaLuchador.jsx          tarjeta de un luchador
 ```
 
