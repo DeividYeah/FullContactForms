@@ -4,10 +4,9 @@ Misión M4 de Programación Web I (U-tad). App en **React 19 + Vite** para inscr
 luchadores en un torneo de deportes de contacto y ver la lista de inscritos.
 
 - **Formulario de inscripción** con React Hook Form (no controlado) y validación con Zod:
-  nombre, apodo único, email, fecha de nacimiento, disciplina, peso, categoría de peso,
-  años de experiencia, teléfono y grito de guerra opcionales y aceptación del reglamento.
-- **Listado** de inscritos con TanStack Query: filtro por categoría y botón para retirar
-  una inscripción.
+  nombre, apodo único, email, fecha de nacimiento, disciplina, peso, categoría de peso
+  y aceptación del reglamento.
+- **Listado** de inscritos con TanStack Query, con botón para retirar una inscripción.
 - **Reto bonus:** las respuestas del API también se validan con Zod (`safeParse`). En los
   datos de ejemplo hay un registro corrupto (`glitch`) que la app aparta y explica en vez de pintarlo.
 
@@ -50,20 +49,17 @@ src/
   De ahí salen `inscripcionSchema` (formulario, añade `aceptaReglamento`) y `luchadorSchema`
   (respuesta del API, añade `id` y `creadoEn`). Las dos comparten `reglasCruzadas`:
   - edad entre 16 y 60 años, calculada desde la fecha de nacimiento;
-  - el peso tiene que caber en la categoría elegida;
-  - los años de experiencia no pueden superar la edad menos 4.
+  - el peso tiene que caber en la categoría elegida.
   Los errores cruzados se asignan al campo concreto con `path`, así se pintan debajo de él.
-- **Formulario no controlado.** Todo pasa por `register`; solo se usa `watch` para el contador
-  del grito de guerra y para sugerir la categoría según el peso (botón "Usar esa categoría"
-  con `setValue`). `mode: 'onTouched'` para no gritar errores mientras se escribe por primera vez.
-  Los números usan `valueAsNumber` para que Zod reciba `number`.
+- **Formulario no controlado.** Todo pasa por `register`, sin `useState` por campo.
+  `mode: 'onTouched'` para no gritar errores mientras se escribe por primera vez.
+  El peso usa `valueAsNumber` para que Zod reciba `number`.
 - **Accesibilidad.** Cada campo tiene `label` con `htmlFor`, `aria-invalid` y `aria-describedby`
   apuntando a la ayuda y al error; los errores tienen `role="alert"` y RHF lleva el foco al
   primer campo con error. El botón se desactiva y cambia a "Inscribiendo…" mientras se envía.
-- **Claves de TanStack Query.** Todas cuelgan de `['luchadores']`
-  (la lista es `['luchadores', 'lista', { categoria }]`). Al crear o borrar se invalida
-  `['luchadores']`, que refresca la lista con cualquier filtro. `placeholderData: keepPreviousData`
-  evita que la lista desaparezca al cambiar de filtro (se ve "Actualizando…").
+- **TanStack Query.** La lista usa la clave `['luchadores']` (constante `CLAVE_LUCHADORES`).
+  Al crear o borrar, el `onSuccess` de la mutación invalida esa clave y la lista se vuelve
+  a pedir sola, sin recargar la página.
 - **Errores del servidor en el formulario.** Si el apodo ya existe, `crearLuchador` lanza un
   `ErrorApi` con `campo: 'apodo'` y el `onError` de la mutación lo pone en el campo con `setError`.
 
@@ -75,12 +71,13 @@ src/
   1. "aquí tienes el enunciado" (adjuntando el PDF de la M4).
   2. "vamos a hacer otro hilo para la m4", dentro de la conversación donde ya habíamos hecho la M3.
 - **Cómo lo verifiqué:** arranqué la app con `npm run dev` y probé a mano: enviar vacío (salen
-  todos los errores), peso que no cuadra con la categoría, experiencia imposible para la edad,
+  todos los errores), peso que no cuadra con la categoría,
   apodo repetido (`el-muro`), una inscripción correcta (aparece en la lista sin recargar),
-  el filtro por categoría, retirar una inscripción y parar la API para ver el error.
+  retirar una inscripción y parar la API para ver el error.
   También comprobé que el registro `glitch` sale en el aviso de descartados.
-- **Qué hice yo:** elegir el dominio, probar los casos de arriba y revisar el código para
-  poder explicarlo.
+- **Qué hice yo:** elegir el dominio, probar los casos de arriba, revisar el código para
+  poder explicarlo y pedir que se simplificara (quité teléfono, grito de guerra, años de
+  experiencia, la sugerencia de categoría y el filtro por categoría).
 
 ## Autopsia
 
