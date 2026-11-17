@@ -41,16 +41,6 @@ const camposLuchador = z.object({
     .min(45, 'El peso mínimo del torneo es 45 kg')
     .max(150, 'El peso máximo del torneo es 150 kg'),
   categoria: z.enum(Object.keys(CATEGORIAS), 'Elige una categoría de peso'),
-  experiencia: z
-    .number('Indica tus años de experiencia')
-    .int('Solo años enteros')
-    .min(0, 'No puede ser negativa'),
-  telefono: z
-    .string()
-    .trim()
-    .regex(/^([6789]\d{8})?$/, 'Teléfono español de 9 cifras (empieza por 6, 7, 8 o 9)')
-    .optional(),
-  grito: z.string().trim().max(80, 'El grito de guerra no puede pasar de 80 caracteres').optional(),
 })
 
 // Reglas que relacionan varios campos entre sí.
@@ -68,14 +58,6 @@ function reglasCruzadas(datos, ctx) {
       code: 'custom',
       path: ['categoria'],
       message: `Con ${datos.peso} kg no entras en ${nombre} (${min}–${max} kg)`,
-    })
-  }
-
-  if (datos.experiencia > edad - 4) {
-    ctx.addIssue({
-      code: 'custom',
-      path: ['experiencia'],
-      message: `Con ${edad} años no puedes llevar ${datos.experiencia} entrenando`,
     })
   }
 }
