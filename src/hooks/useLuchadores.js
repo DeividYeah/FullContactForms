@@ -1,18 +1,13 @@
-import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { borrarLuchador, crearLuchador, obtenerLuchadores } from '../api/luchadores.js'
 
-// Fábrica de claves: todas cuelgan de ['luchadores'], así una sola
-// invalidación refresca la lista con cualquier filtro.
-export const clavesLuchadores = {
-  todos: ['luchadores'],
-  lista: (categoria) => ['luchadores', 'lista', { categoria }],
-}
+// Clave de la lista. Crear y borrar la invalidan para que se vuelva a pedir.
+export const CLAVE_LUCHADORES = ['luchadores']
 
-export function useLuchadores(categoria) {
+export function useLuchadores() {
   return useQuery({
-    queryKey: clavesLuchadores.lista(categoria),
-    queryFn: () => obtenerLuchadores(categoria),
-    placeholderData: keepPreviousData,
+    queryKey: CLAVE_LUCHADORES,
+    queryFn: obtenerLuchadores,
   })
 }
 
@@ -20,7 +15,7 @@ export function useCrearLuchador() {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: crearLuchador,
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: clavesLuchadores.todos }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: CLAVE_LUCHADORES }),
   })
 }
 
@@ -28,6 +23,6 @@ export function useBorrarLuchador() {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: borrarLuchador,
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: clavesLuchadores.todos }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: CLAVE_LUCHADORES }),
   })
 }

@@ -29,10 +29,8 @@ async function pedir(url, opciones) {
 // Reto bonus: no nos fiamos del servidor. Cada luchador que llega se valida
 // con el mismo esquema Zod que el formulario. Los que no cumplen se apartan
 // en "descartados" en vez de romper toda la lista.
-export async function obtenerLuchadores(categoria) {
-  const params = new URLSearchParams({ _sort: 'creadoEn', _order: 'desc' })
-  if (categoria) params.set('categoria', categoria)
-  const json = await pedir(`${API_URL}?${params}`)
+export async function obtenerLuchadores() {
+  const json = await pedir(`${API_URL}?_sort=creadoEn&_order=desc`)
 
   const lista = z.array(z.unknown()).safeParse(json)
   if (!lista.success) {

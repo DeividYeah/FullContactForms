@@ -1,11 +1,8 @@
-import { useState } from 'react'
-import { CATEGORIAS } from '../schemas/luchador.js'
 import { useBorrarLuchador, useLuchadores } from '../hooks/useLuchadores.js'
 import TarjetaLuchador from './TarjetaLuchador.jsx'
 
 export default function ListaLuchadores() {
-  const [categoria, setCategoria] = useState('')
-  const { data, isPending, isError, error, isFetching, refetch } = useLuchadores(categoria)
+  const { data, isPending, isError, error, refetch } = useLuchadores()
   const borrar = useBorrarLuchador()
 
   function handleBorrar(luchador) {
@@ -16,20 +13,7 @@ export default function ListaLuchadores() {
 
   return (
     <section className="listado" aria-labelledby="titulo-lista">
-      <div className="cabecera-lista">
-        <h2 id="titulo-lista">Luchadores inscritos</h2>
-        {isFetching && !isPending && <span className="actualizando">Actualizando…</span>}
-      </div>
-
-      <label htmlFor="filtro-categoria">Categoría: </label>
-      <select id="filtro-categoria" value={categoria} onChange={(e) => setCategoria(e.target.value)}>
-        <option value="">Todas</option>
-        {Object.entries(CATEGORIAS).map(([clave, c]) => (
-          <option key={clave} value={clave}>
-            {c.nombre}
-          </option>
-        ))}
-      </select>
+      <h2 id="titulo-lista">Luchadores inscritos</h2>
 
       {borrar.isError && <p className="aviso fallo">❌ No se pudo retirar: {borrar.error.message}</p>}
 
@@ -66,7 +50,7 @@ export default function ListaLuchadores() {
         </details>
       )}
 
-      {data && data.luchadores.length === 0 && <p>Todavía no hay nadie en esta categoría. ¡Sé el primero!</p>}
+      {data && data.luchadores.length === 0 && <p>Todavía no hay nadie inscrito. ¡Sé el primero!</p>}
 
       {data && data.luchadores.length > 0 && (
         <ul className="lista">
